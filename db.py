@@ -117,4 +117,4 @@ def init_db():
         database.start()
         load_init_data()
     else:
-        database.connect()
+        database.connect(reuse_if_open=True)
