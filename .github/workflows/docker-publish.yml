@@ -3,7 +3,7 @@ name: Docker publish
 on:
   push:
     branches:
-      - main
+      - "main"
 
 env:
   IMAGE_NAME: dk-bot
