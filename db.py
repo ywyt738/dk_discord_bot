@@ -1,14 +1,10 @@
 import pathlib
-from peewee import (
-    SqliteDatabase,
-    Model,
-    BigIntegerField,
-    CharField,
-    ForeignKeyField,
-    SmallIntegerField,
-)
 
-DATABASE = "./db/dk.db"
+from peewee import (BigIntegerField, BooleanField, CharField, ForeignKeyField,
+                    Model, SmallIntegerField, SqliteDatabase)
+
+from config import DATABASE
+
 database = SqliteDatabase(DATABASE)
 
 
@@ -28,17 +24,21 @@ class PlayerName(Model):
             return False
 
 
+class Staff(Model):
+    discord_id = BigIntegerField(primary_key=True, unique=True)
+    is_admin = BooleanField(default=False)
+
 class Player(Model):
     discord_id = ForeignKeyField(PlayerName, field="discord_id")
     draw_count = SmallIntegerField(default=0)
-    card_1 = SmallIntegerField(null=0, default=0)
-    card_2 = SmallIntegerField(null=0, default=0)
-    card_3 = SmallIntegerField(null=0, default=0)
-    card_4 = SmallIntegerField(null=0, default=0)
-    card_5 = SmallIntegerField(null=0, default=0)
-    card_6 = SmallIntegerField(null=0, default=0)
-    card_7 = SmallIntegerField(null=0, default=0)
-    card_8 = SmallIntegerField(null=0, default=0)
+    card_1 = SmallIntegerField(default=0)
+    card_2 = SmallIntegerField(default=0)
+    card_3 = SmallIntegerField(default=0)
+    card_4 = SmallIntegerField(default=0)
+    card_5 = SmallIntegerField(default=0)
+    card_6 = SmallIntegerField(default=0)
+    card_7 = SmallIntegerField(default=0)
+    card_8 = SmallIntegerField(default=0)
 
     class Meta:
         database = database
@@ -88,14 +88,25 @@ CARD_MAPPING = {
 }
 
 
+def load_init_data():
+    staff_list = [
+        616502749579837445,
+        912103315800735764,
+        433004236175835138,
+        708571256508645409,
+    ]
+    for i in staff_list:
+        Staff.create(discord_id=i)
+
 def init_db():
     if not pathlib.Path(DATABASE).exists():
         database.connect()
         create_tables()
+        load_init_data()
     else:
         database.connect()
 
 
 def create_tables():
     with database:
-        database.create_tables([Player, PlayerName])
+        database.create_tables([Player, PlayerName, Staff])

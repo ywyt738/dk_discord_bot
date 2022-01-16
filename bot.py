@@ -6,86 +6,19 @@ from discord.ext import commands
 from loguru import logger
 from playhouse.shortcuts import model_to_dict
 
-from db import CARD_MAPPING, Player, PlayerName, init_db
+from config import BOT_TOKEN, INIT_POOL, POOL, PROXY
+from db import CARD_MAPPING, Player, PlayerName, Staff, init_db
+from exception import CardNotExist, PlayerNotExist
+from utils.checks import is_not_player, is_player, is_staff
 
-"""
-如何获得抽贴：
-1. 每个在dk的人都可免费获得一个字帖（初始），可随机抽一个，然后一起进入活动
-指令：/虎年 加入
-指令：/虎年 抽帖
 
-3. 抽到字帖可赠送给别人
-指令：/虎年 赠送字帖'与'to：@
-
-活动指令：
-使用 /虎年 加入    加入dk新年的狂欢
-使用 /虎年 帮助   查看所有的指令
-使用 /虎年 抽帖   可随机获得一个字帖
-使用 /虎年 我的信息 可查看我所拥有的剩余抽帖数量和拥有的所有字帖
-使用 /虎年 赠送字帖'与' @xxx
-使用 /虎年 赠送字帖'D'  @xxx
-使用 /虎年 赠送字帖'K'  @xxx
-使用 /虎年 赠送字帖'共' @xxx
-使用 /虎年 赠送字帖'同' @xxx
-使用 /虎年 赠送字帖'迎' @xxx
-使用 /虎年 赠送字帖'虎' @xxx
-使用 /虎年 赠送字帖'年' @xxx
-
-客服管理专用：
-使用 /虎年 增加 @xxx 1
-"""
-
-PROXY = os.environ.get("HTTP_PROXY", None)
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
 bot = commands.Bot(command_prefix="$", proxy=PROXY)
-
-
-INIT_POOL = "与共同迎" * 375 + "K年" * 100
-POOL = "与共同迎" * 375 + "K年" * 100 + "D虎" * 20
-
-
-class IsNotPlayer(commands.CheckFailure):
-    pass
-
-
-class IsPlayer(commands.CheckFailure):
-    pass
-
-
-class CardNotExisit(commands.CommandError):
-    pass
-
-
-class PlayerNotExisit(commands.CommandError):
-    pass
 
 
 def draw(pool: str):
     """随机抽取一帖"""
     result = random.choice(pool)
     return result
-
-
-def is_player():
-    """已加入玩家校验"""
-
-    async def predicate(ctx):
-        if not PlayerName.exisit(ctx.author.id):
-            raise IsNotPlayer("你还没有加入活动。")
-        return True
-
-    return commands.check(predicate)
-
-
-def is_not_player():
-    """新玩家校验"""
-
-    async def predicate(ctx):
-        if PlayerName.exisit(ctx.author.id):
-            raise IsPlayer("你已经加入活动。")
-        return True
-
-    return commands.check(predicate)
 
 
 def player_info(discord_id):
@@ -95,8 +28,18 @@ def player_info(discord_id):
     for card_name, card_sys_name in CARD_MAPPING.items():
         if c := player_info[card_sys_name]:
             card_info += f"{card_name}:{c} "
-
     return f"""{player_info['discord_id']['name']}玩家剩余抽帖次数：{player_info['draw_count']}\n已经获得帖：{card_info}"""
+
+
+def send_card(owner: int, to: int, card: str, count: int = 1):
+    if not PlayerName.Exist(to):
+        raise PlayerNotExist("你要赠送的玩家还没进入活动。")
+    owner = Player.get(Player.discord_id == owner)
+    if owner.get_card_count(card) < count:
+        raise CardNotExist(f"你的[{card}]帖不足。")
+    target = Player.get(Player.discord_id == to)
+    owner.change_card(card, count)
+    target.change_card(card, count)
 
 
 @bot.group(name="虎年")
@@ -145,17 +88,6 @@ async def get(ctx):
 async def info(ctx):
     player = ctx.author.id
     await ctx.reply(player_info(player))
-
-
-def send_card(owner: int, to: int, card: str, count: int = 1):
-    if not PlayerName.exisit(to):
-        raise PlayerNotExisit("你要赠送的玩家还没进入活动。")
-    owner = Player.get(Player.discord_id == owner)
-    if owner.get_card_count(card) < count:
-        raise CardNotExisit(f"你的[{card}]帖不足。")
-    target = Player.get(Player.discord_id == to)
-    owner.change_card(card, count)
-    target.change_card(card, count)
 
 
 @tiger.command(name="赠送字帖'与'")
@@ -215,7 +147,15 @@ async def send_8(ctx, user: discord.User):
 
 
 # 管理员指令
+@tiger.command(name="管理员")
+@is_staff()
+async def add_admin(ctx, user:discord.User):
+    Staff.create(discord_id=user.id)
+    await ctx.reply(f"已经任命{user.name}为管理员")
+
+
 @tiger.command(name="增加")
+@is_staff()
 async def add_count(ctx, user: discord.User, count: int):
     player = Player.get(Player.discord_id==user.id)
     player.draw_count += count
@@ -223,7 +163,7 @@ async def add_count(ctx, user: discord.User, count: int):
     await ctx.reply(f"给{player.discord_id.name}增加{count}次抽帖次数。")
 
 
-########################
+# 事件处理
 @bot.event
 async def on_ready():
     """机器人ready"""
@@ -234,11 +174,11 @@ async def on_ready():
 async def on_command_error(ctx, error):
     # 没有参加活动报错处理
     match type(error).__name__:
-        case "IsNotPlayer"|"CardNotExisit"|"PlayerNotExisit"|"IsPlayer":
+        case "IsNotPlayer"|"CardNotExist"|"PlayerNotExist"|"IsPlayer"|"IsNotStaff":
             await ctx.send(error)
         case _:
             logger.error(error)
-########################
+
 
 init_db()
 bot.run(BOT_TOKEN)
