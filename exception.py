@@ -13,9 +13,9 @@ class IsNotStaff(commands.CheckFailure):
     pass
 
 
-class CardNotExisit(commands.CommandError):
+class CardNotExist(commands.CommandError):
     pass
 
 
-class PlayerNotExisit(commands.CommandError):
+class PlayerNotExist(commands.CommandError):
     pass
