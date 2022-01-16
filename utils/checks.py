@@ -7,7 +7,7 @@ def is_player():
     """已加入玩家校验"""
 
     async def predicate(ctx):
-        if not PlayerName.Exist(ctx.author.id):
+        if not PlayerName.exisit(ctx.author.id):
             raise IsNotPlayer("你还没有加入活动。")
         return True
 
@@ -18,7 +18,7 @@ def is_not_player():
     """新玩家校验"""
 
     async def predicate(ctx):
-        if PlayerName.Exist(ctx.author.id):
+        if PlayerName.exisit(ctx.author.id):
             raise IsPlayer("你已经加入活动。")
         return True
 
