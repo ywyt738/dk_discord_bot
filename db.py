@@ -5,14 +5,15 @@ from peewee import (BigIntegerField, BooleanField, CharField, ForeignKeyField,
 from playhouse.sqliteq import SqliteQueueDatabase
 
 from config import DATABASE
+from loguru import logger
 
-database = SqliteDatabase(DATABASE,pragmas={
-    'journal_mode': 'wal',
-    'cache_size': -1 * 64000,  # 64MB
-    'foreign_keys': 1,
-    'ignore_check_constraints': 0,
-    'synchronous': 0})
-# database = SqliteQueueDatabase(DATABASE, queue_max_size=64, results_timeout=5.0)
+# database = SqliteDatabase(DATABASE,pragmas={
+#     'journal_mode': 'wal',
+#     'cache_size': -1 * 64000,  # 64MB
+#     'foreign_keys': 1,
+#     'ignore_check_constraints': 0,
+#     'synchronous': 0})
+database = SqliteQueueDatabase(DATABASE, autostart=False, queue_max_size=64, results_timeout=5)
 
 class BaseModel(Model):
     class Meta:
@@ -107,9 +108,13 @@ def load_init_data():
         Staff.create(discord_id=i)
 
 def init_db():
-    if not pathlib.Path(DATABASE).exists():
-        database.connect()
+    if not database.get_tables():
+        logger.info("创建数据库")
+        database.start()
         database.create_tables([Player, PlayerName, Staff])
+        database.stop()
+        logger.info(database.get_tables())
+        database.start()
         load_init_data()
     else:
         database.connect()
