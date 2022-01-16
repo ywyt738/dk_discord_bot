@@ -28,6 +28,9 @@ class Staff(Model):
     discord_id = BigIntegerField(primary_key=True, unique=True)
     is_admin = BooleanField(default=False)
 
+    class Meta:
+        database = database
+
 class Player(Model):
     discord_id = ForeignKeyField(PlayerName, field="discord_id")
     draw_count = SmallIntegerField(default=0)
