@@ -1,12 +1,12 @@
+import os
 import random
-from collections import Counter
 
 import discord
 from discord.ext import commands
 from loguru import logger
 from playhouse.shortcuts import model_to_dict
 
-from db import init_db, Player, PlayerName, CARD_MAPPING
+from db import CARD_MAPPING, Player, PlayerName, init_db
 
 """
 如何获得抽贴：
@@ -35,7 +35,9 @@ from db import init_db, Player, PlayerName, CARD_MAPPING
 使用 /虎年 增加 @xxx 1
 """
 
-bot = commands.Bot(command_prefix="$")
+PROXY = os.environ.get("HTTP_PROXY", None)
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+bot = commands.Bot(command_prefix="$", proxy="http://127.0.0.1:8118")
 
 
 INIT_POOL = "与共同迎" * 375 + "K年" * 100
@@ -239,4 +241,4 @@ async def on_command_error(ctx, error):
 ########################
 
 init_db()
-bot.run("OTMxMzgzODIyMTkxMzA4ODEx.YeDoxw.1Z_YcbwUmN-4Z5SLgNPc0fAb4l4")
+bot.run(BOT_TOKEN)
