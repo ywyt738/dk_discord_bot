@@ -30,7 +30,7 @@ class PlayerName(Model):
 
 class Player(Model):
     discord_id = ForeignKeyField(PlayerName, field="discord_id")
-    draw_count = SmallIntegerField(default=1)
+    draw_count = SmallIntegerField(default=0)
     card_1 = SmallIntegerField(null=0, default=0)
     card_2 = SmallIntegerField(null=0, default=0)
     card_3 = SmallIntegerField(null=0, default=0)
