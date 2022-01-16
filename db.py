@@ -6,13 +6,13 @@ from playhouse.sqliteq import SqliteQueueDatabase
 
 from config import DATABASE
 
-# database = SqliteDatabase(DATABASE,pragmas={
-#     'journal_mode': 'wal',
-#     'cache_size': -1 * 64000,  # 64MB
-#     'foreign_keys': 1,
-#     'ignore_check_constraints': 0,
-#     'synchronous': 0})
-database = SqliteQueueDatabase(DATABASE, queue_max_size=64, results_timeout=5.0)
+database = SqliteDatabase(DATABASE,pragmas={
+    'journal_mode': 'wal',
+    'cache_size': -1 * 64000,  # 64MB
+    'foreign_keys': 1,
+    'ignore_check_constraints': 0,
+    'synchronous': 0})
+# database = SqliteQueueDatabase(DATABASE, queue_max_size=64, results_timeout=5.0)
 
 class BaseModel(Model):
     class Meta:
@@ -22,9 +22,6 @@ class BaseModel(Model):
 class PlayerName(BaseModel):
     discord_id = BigIntegerField(primary_key=True, unique=True)
     name = CharField()
-
-    class Meta:
-        database = database
 
     @staticmethod
     def exisit(discord_id):
@@ -39,8 +36,6 @@ class Staff(BaseModel):
     discord_id = BigIntegerField(primary_key=True, unique=True)
     is_admin = BooleanField(default=False)
 
-    class Meta:
-        database = database
 
 class Player(BaseModel):
     discord_id = ForeignKeyField(PlayerName, field="discord_id")
@@ -54,8 +49,6 @@ class Player(BaseModel):
     card_7 = SmallIntegerField(default=0)
     card_8 = SmallIntegerField(default=0)
 
-    class Meta:
-        database = database
 
     def change_card(self, card_name, count):
         match card_name:
@@ -116,12 +109,7 @@ def load_init_data():
 def init_db():
     if not pathlib.Path(DATABASE).exists():
         database.connect()
-        create_tables()
+        database.create_tables([Player, PlayerName, Staff])
         load_init_data()
     else:
         database.connect()
-
-
-def create_tables():
-    with database:
-        database.create_tables([Player, PlayerName, Staff])
