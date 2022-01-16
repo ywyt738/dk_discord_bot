@@ -27,7 +27,7 @@ def is_not_player():
 
 def is_staff():
     async def predicate(ctx):
-        staff = Staff.get(Staff.discord_id == ctx.author.id)
+        staff = Staff.get_or_none(Staff.discord_id == ctx.author.id)
         if not staff:
             raise IsNotStaff("你不是工作人员。")
         return True
