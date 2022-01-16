@@ -2,13 +2,24 @@ import pathlib
 
 from peewee import (BigIntegerField, BooleanField, CharField, ForeignKeyField,
                     Model, SmallIntegerField, SqliteDatabase)
+from playhouse.sqliteq import SqliteQueueDatabase
 
 from config import DATABASE
 
-database = SqliteDatabase(DATABASE)
+# database = SqliteDatabase(DATABASE,pragmas={
+#     'journal_mode': 'wal',
+#     'cache_size': -1 * 64000,  # 64MB
+#     'foreign_keys': 1,
+#     'ignore_check_constraints': 0,
+#     'synchronous': 0})
+database = SqliteQueueDatabase(DATABASE, queue_max_size=64, results_timeout=5.0)
+
+class BaseModel(Model):
+    class Meta:
+        database = database
 
 
-class PlayerName(Model):
+class PlayerName(BaseModel):
     discord_id = BigIntegerField(primary_key=True, unique=True)
     name = CharField()
 
@@ -24,14 +35,14 @@ class PlayerName(Model):
             return False
 
 
-class Staff(Model):
+class Staff(BaseModel):
     discord_id = BigIntegerField(primary_key=True, unique=True)
     is_admin = BooleanField(default=False)
 
     class Meta:
         database = database
 
-class Player(Model):
+class Player(BaseModel):
     discord_id = ForeignKeyField(PlayerName, field="discord_id")
     draw_count = SmallIntegerField(default=0)
     card_1 = SmallIntegerField(default=0)
