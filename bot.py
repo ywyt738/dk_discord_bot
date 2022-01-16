@@ -35,7 +35,7 @@ from db import init_db, Player, PlayerName, CARD_MAPPING
 使用 /虎年 增加 @xxx 1
 """
 
-bot = commands.Bot(command_prefix="$", proxy="http://127.0.0.1:8118")
+bot = commands.Bot(command_prefix="$")
 
 
 INIT_POOL = "与共同迎" * 375 + "K年" * 100
