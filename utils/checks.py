@@ -32,4 +32,4 @@ def is_staff():
             raise IsNotStaff("你不是工作人员。")
         return True
 
-    return predicate
+    return commands.check(predicate)
