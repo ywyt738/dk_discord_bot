@@ -8,7 +8,7 @@ from peewee import (
     SmallIntegerField,
 )
 
-DATABASE = "dk.db"
+DATABASE = "./db/dk.db"
 database = SqliteDatabase(DATABASE)
 
 
