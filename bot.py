@@ -37,7 +37,7 @@ from db import CARD_MAPPING, Player, PlayerName, init_db
 
 PROXY = os.environ.get("HTTP_PROXY", None)
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
-bot = commands.Bot(command_prefix="$", proxy="http://127.0.0.1:8118")
+bot = commands.Bot(command_prefix="$", proxy=PROXY)
 
 
 INIT_POOL = "与共同迎" * 375 + "K年" * 100
