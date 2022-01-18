@@ -7,13 +7,13 @@ from playhouse.sqliteq import SqliteQueueDatabase
 from config import DATABASE
 from loguru import logger
 
-# database = SqliteDatabase(DATABASE,pragmas={
-#     'journal_mode': 'wal',
-#     'cache_size': -1 * 64000,  # 64MB
-#     'foreign_keys': 1,
-#     'ignore_check_constraints': 0,
-#     'synchronous': 0})
-database = SqliteQueueDatabase(DATABASE, autostart=False, queue_max_size=64, results_timeout=5)
+database = SqliteDatabase(DATABASE,pragmas={
+    'journal_mode': 'wal',
+    'cache_size': -1 * 64000,  # 64MB
+    'foreign_keys': 1,
+    'ignore_check_constraints': 0,
+    'synchronous': 0})
+# database = SqliteQueueDatabase(DATABASE, autostart=False, queue_max_size=64, results_timeout=5)
 
 class BaseModel(Model):
     class Meta:
@@ -110,11 +110,11 @@ def load_init_data():
 def init_db():
     if not database.get_tables():
         logger.info("创建数据库")
-        database.start()
+        # database.start()
         database.create_tables([Player, PlayerName, Staff])
-        database.stop()
+        # database.stop()
         logger.info(database.get_tables())
-        database.start()
+        # database.start()
         load_init_data()
     else:
         database.connect(reuse_if_open=True)
