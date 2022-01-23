@@ -51,7 +51,6 @@ async def tiger(ctx):
 # 玩家指令
 @tiger.command(name="帮助")
 async def help(ctx):
-    logger("command help")
     await ctx.reply("""命令:
     $虎年 加入                 参加活动
     $虎年 抽帖                 抽一次帖
