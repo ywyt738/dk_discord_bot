@@ -52,7 +52,18 @@ async def tiger(ctx):
 @tiger.command(name="帮助")
 async def help(ctx):
     logger("command help")
-    await ctx.reply("帮助")
+    await ctx.reply("""命令:
+    $虎年 加入                 参加活动
+    $虎年 抽帖                 抽一次帖
+    $虎年 我的信息             查看现有获取帖到情况以及剩余抽帖次数
+    $虎年 赠送字帖'与' @xxx    将帖送给玩家xxx（引号为英文单引号）
+    $虎年 赠送字帖'D' @xxx
+    $虎年 赠送字帖'K' @xxx
+    $虎年 赠送字帖'共' @xxx
+    $虎年 赠送字帖'同' @xxx
+    $虎年 赠送字帖'迎' @xxx
+    $虎年 赠送字帖'虎' @xxx
+    $虎年 赠送字帖'年' @xxx""")
 
 
 @tiger.command(name="加入")
@@ -80,7 +91,7 @@ async def get(ctx):
         return
     player.draw_count -= 1  # 抽次数减少一次
     player.change_card(card, 1)
-    await ctx.reply(f"抽到1张'{card}'\n{player_info(player)}")
+    await ctx.reply(f"抽到1张'{card}'\n{player_info(player.discord_id)}")
 
 
 @tiger.command(name="我的信息")
