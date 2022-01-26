@@ -13,6 +13,18 @@ from utils.checks import is_not_player, is_player, is_staff
 
 
 bot = commands.Bot(command_prefix="$", proxy=PROXY)
+HELP_STRING = """命令（括号内是快捷命令）:
+$虎年 加入(join/j)\t参加活动
+$虎年 抽帖(raffle/r)\t抽一次帖
+$虎年 我的信息(info)\t查看现有获取帖到情况以及剩余抽帖次数
+$虎年 赠送字帖(give)'与' @xxx\t将帖送给玩家xxx（引号为英文单引号）
+$虎年 赠送字帖'D' @xxx
+$虎年 赠送字帖'K' @xxx
+$虎年 赠送字帖'共' @xxx
+$虎年 赠送字帖'同' @xxx
+$虎年 赠送字帖'迎' @xxx
+$虎年 赠送字帖'虎' @xxx
+$虎年 赠送字帖'年' @xxx"""
 
 
 def draw(pool: str):
@@ -49,26 +61,9 @@ async def tiger(ctx):
 
 
 # 玩家指令
-@tiger.command(name="帮助")
-async def help(ctx):
-    await ctx.reply("""命令:
-    $虎年 加入                 参加活动
-    $虎年 join                参加活动
-    $虎年 j                   参加活动
-    $虎年 抽帖                 抽一次帖
-    $虎年 raffle              抽一次帖
-    $虎年 r                   抽一次帖
-    $虎年 我的信息             查看现有获取帖到情况以及剩余抽帖次数
-    $虎年 info               查看现有获取帖到情况以及剩余抽帖次数
-    $虎年 赠送字帖'与' @xxx    将帖送给玩家xxx（引号为英文单引号）
-    $虎年 赠送字帖'D' @xxx
-    $虎年 赠送字帖'K' @xxx
-    $虎年 赠送字帖'共' @xxx
-    $虎年 赠送字帖'同' @xxx
-    $虎年 赠送字帖'迎' @xxx
-    $虎年 赠送字帖'虎' @xxx
-    $虎年 赠送字帖'年' @xxx
-    $虎年 give'X' @xxx      将帖送给玩家xxx（引号为英文单引号""")
+# @tiger.command(name="帮助")
+async def _help(ctx):
+    await ctx.reply(HELP_STRING)
 
 
 # @tiger.command(name="加入")
@@ -195,6 +190,9 @@ async def on_command_error(ctx, error):
         case _:
             logger.error(error)
 
+
+bot.add_command(tiger.command(name="帮助")(_help))
+bot.add_command(tiger.command(name="h")(_help))
 
 bot.add_command(tiger.command(name="加入")(_join))
 bot.add_command(tiger.command(name="join")(_join))
