@@ -53,8 +53,13 @@ async def tiger(ctx):
 async def help(ctx):
     await ctx.reply("""命令:
     $虎年 加入                 参加活动
+    $虎年 join                参加活动
+    $虎年 j                   参加活动
     $虎年 抽帖                 抽一次帖
+    $虎年 raffle              抽一次帖
+    $虎年 r                   抽一次帖
     $虎年 我的信息             查看现有获取帖到情况以及剩余抽帖次数
+    $虎年 info               查看现有获取帖到情况以及剩余抽帖次数
     $虎年 赠送字帖'与' @xxx    将帖送给玩家xxx（引号为英文单引号）
     $虎年 赠送字帖'D' @xxx
     $虎年 赠送字帖'K' @xxx
@@ -62,7 +67,8 @@ async def help(ctx):
     $虎年 赠送字帖'同' @xxx
     $虎年 赠送字帖'迎' @xxx
     $虎年 赠送字帖'虎' @xxx
-    $虎年 赠送字帖'年' @xxx""")
+    $虎年 赠送字帖'年' @xxx
+    $虎年 give'X' @xxx      将帖送给玩家xxx（引号为英文单引号""")
 
 
 # @tiger.command(name="加入")
