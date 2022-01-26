@@ -65,9 +65,9 @@ async def help(ctx):
     $虎年 赠送字帖'年' @xxx""")
 
 
-@tiger.command(name="加入")
+# @tiger.command(name="加入")
 @is_not_player()
-async def join(ctx):
+async def _join(ctx):
     # 获取用户id
     discord_id = ctx.author.id
     name = ctx.author.name
@@ -79,9 +79,9 @@ async def join(ctx):
     await ctx.reply(player_info(player_name.discord_id))
 
 
-@tiger.command(name="抽帖")
+# @tiger.command(name="抽帖")
 @is_player()
-async def get(ctx):
+async def _raffle(ctx):
     logger.info("Command get")
     player = Player.get(Player.discord_id == ctx.author.id)
     card = draw(POOL)
@@ -93,65 +93,65 @@ async def get(ctx):
     await ctx.reply(f"抽到1张'{card}'\n{player_info(player.discord_id)}")
 
 
-@tiger.command(name="我的信息")
+# @tiger.command(name="我的信息")
 @is_player()
-async def info(ctx):
+async def _info(ctx):
     player = ctx.author.id
     await ctx.reply(player_info(player))
 
 
-@tiger.command(name="赠送字帖'与'")
+# @tiger.command(name="赠送字帖'与'")
 @is_player()
-async def send_1(ctx, user: discord.User):
+async def _send_1(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "与")
     await ctx.reply("赠送字帖'与'")
 
 
-@tiger.command(name="赠送字帖'D'")
+# @tiger.command(name="赠送字帖'D'")
 @is_player()
-async def send_2(ctx, user: discord.User):
+async def _send_2(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "D")
     await ctx.reply("赠送字帖'D'")
 
 
-@tiger.command(name="赠送字帖'K'")
+# @tiger.command(name="赠送字帖'K'")
 @is_player()
-async def send_3(ctx, user: discord.User):
+async def _send_3(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "K")
     await ctx.reply("赠送字帖'K'")
 
 
-@tiger.command(name="赠送字帖'共'")
+# @tiger.command(name="赠送字帖'共'")
 @is_player()
-async def send_4(ctx, user: discord.User):
+async def _send_4(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "共")
     await ctx.reply("赠送字帖'共'")
 
 
-@tiger.command(name="赠送字帖'同'")
+# @tiger.command(name="赠送字帖'同'")
 @is_player()
-async def send_5(ctx, user: discord.User):
+async def _send_5(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "同")
     await ctx.reply("赠送字帖'同'")
 
 
-@tiger.command(name="赠送字帖'迎'")
+# @tiger.command(name="赠送字帖'迎'")
 @is_player()
-async def send_6(ctx, user: discord.User):
+async def _send_6(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "迎")
     await ctx.reply("赠送字帖'迎'")
 
 
-@tiger.command(name="赠送字帖'虎'")
+# @tiger.command(name="赠送字帖'虎'")
 @is_player()
-async def send_7(ctx, user: discord.User):
+async def _send_7(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "虎")
     await ctx.reply("赠送字帖'虎'")
 
 
-@tiger.command(name="赠送字帖'年'")
+# @tiger.command(name="赠送字帖'年'")
 @is_player()
-async def send_8(ctx, user: discord.User):
+async def _send_8(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "年")
     await ctx.reply("赠送字帖'年'")
 
@@ -188,6 +188,35 @@ async def on_command_error(ctx, error):
             await ctx.send(error)
         case _:
             logger.error(error)
+
+
+bot.add_command(tiger.command(name="加入")(_join))
+bot.add_command(tiger.command(name="join")(_join))
+bot.add_command(tiger.command(name="j")(_join))
+
+bot.add_command(tiger.command(name="抽帖")(_raffle))
+bot.add_command(tiger.command(name="raffle")(_raffle))
+bot.add_command(tiger.command(name="r")(_raffle))
+
+bot.add_command(tiger.command(name="我的信息")(_info))
+bot.add_command(tiger.command(name="info")(_info))
+
+bot.add_command(tiger.command(name="赠送字帖'与'")(_send_1))
+bot.add_command(tiger.command(name="赠送字帖'D'")(_send_2))
+bot.add_command(tiger.command(name="赠送字帖'K'")(_send_3))
+bot.add_command(tiger.command(name="赠送字帖'共'")(_send_4))
+bot.add_command(tiger.command(name="赠送字帖'同'")(_send_5))
+bot.add_command(tiger.command(name="赠送字帖'迎'")(_send_6))
+bot.add_command(tiger.command(name="赠送字帖'虎'")(_send_7))
+bot.add_command(tiger.command(name="赠送字帖'念'")(_send_8))
+bot.add_command(tiger.command(name="give'与'")(_send_1))
+bot.add_command(tiger.command(name="give'D'")(_send_2))
+bot.add_command(tiger.command(name="give'K'")(_send_3))
+bot.add_command(tiger.command(name="give'共'")(_send_4))
+bot.add_command(tiger.command(name="give'同'")(_send_5))
+bot.add_command(tiger.command(name="give'迎'")(_send_6))
+bot.add_command(tiger.command(name="give'虎'")(_send_7))
+bot.add_command(tiger.command(name="give'念'")(_send_8))
 
 
 init_db()
