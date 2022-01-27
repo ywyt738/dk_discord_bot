@@ -44,7 +44,7 @@ def player_info(discord_id):
 
 
 def send_card(owner: int, to: int, card: str, count: int = 1):
-    if not PlayerName.Exist(to):
+    if not PlayerName.exisit(to):
         raise PlayerNotExist("你要赠送的玩家还没进入活动。")
     owner = Player.get(Player.discord_id == owner)
     if owner.get_card_count(card) < count:
