@@ -50,7 +50,7 @@ def send_card(owner: int, to: int, card: str, count: int = 1):
     if owner.get_card_count(card) < count:
         raise CardNotExist(f"你的[{card}]帖不足。")
     target = Player.get(Player.discord_id == to)
-    owner.change_card(card, count)
+    owner.change_card(card, count * -1)
     target.change_card(card, count)
 
 
