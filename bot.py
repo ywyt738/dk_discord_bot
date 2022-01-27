@@ -105,56 +105,56 @@ async def _info(ctx):
 @is_player()
 async def _send_1(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "与")
-    await ctx.reply("赠送字帖'与'")
+    await ctx.reply(f"赠送字帖'与'给{user.name}")
 
 
 # @tiger.command(name="赠送字帖'D'")
 @is_player()
 async def _send_2(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "D")
-    await ctx.reply("赠送字帖'D'")
+    await ctx.reply(f"赠送字帖'D'给{user.name}")
 
 
 # @tiger.command(name="赠送字帖'K'")
 @is_player()
 async def _send_3(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "K")
-    await ctx.reply("赠送字帖'K'")
+    await ctx.reply(f"赠送字帖'K'给{user.name}")
 
 
 # @tiger.command(name="赠送字帖'共'")
 @is_player()
 async def _send_4(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "共")
-    await ctx.reply("赠送字帖'共'")
+    await ctx.reply(f"赠送字帖'共'给{user.name}")
 
 
 # @tiger.command(name="赠送字帖'同'")
 @is_player()
 async def _send_5(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "同")
-    await ctx.reply("赠送字帖'同'")
+    await ctx.reply(f"赠送字帖'同'给{user.name}")
 
 
 # @tiger.command(name="赠送字帖'迎'")
 @is_player()
 async def _send_6(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "迎")
-    await ctx.reply("赠送字帖'迎'")
+    await ctx.reply(f"赠送字帖'迎'给{user.name}")
 
 
 # @tiger.command(name="赠送字帖'虎'")
 @is_player()
 async def _send_7(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "虎")
-    await ctx.reply("赠送字帖'虎'")
+    await ctx.reply(f"赠送字帖'虎'给{user.name}")
 
 
 # @tiger.command(name="赠送字帖'年'")
 @is_player()
 async def _send_8(ctx, user: discord.User):
     send_card(ctx.author.id, user.id, "年")
-    await ctx.reply("赠送字帖'年'")
+    await ctx.reply(f"赠送字帖'年'给{user.name}")
 
 
 # 管理员指令
