@@ -233,7 +233,7 @@ async def prize_pool_info(ctx):
 @tiger.command(name="奖池增加")
 @is_staff()
 async def add_prize(ctx, prize: str, count: int):
-    global POOL
+    global POOL, PRIZE
     c1 = Counter(POOL)
     orgin = " | ".join([f"{i}: {c}" for i, c in c1.items()])
     if prize not in PRIZE.keys():
