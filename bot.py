@@ -230,6 +230,23 @@ async def prize_pool_info(ctx):
     await ctx.author.send(s)
 
 
+@tiger.command(name="奖池增加")
+@is_staff()
+async def add_prize(ctx, prize: str, count: int):
+    global POOL
+    c1 = Counter(POOL)
+    orgin = " | ".join([f"{i}: {c}" for i, c in c1.items()])
+    if prize not in PRIZE.keys():
+        await ctx.reply(f"【{prize}】不是正确的奖品。\n奖品只能是如下几种: {PRIZE.keys()}")
+    else:
+        POOL = POOL + [prize] * count
+        c2 = Counter(POOL)
+        with open(POOL_JSON, 'w') as f:
+            json.dump(POOL, f)
+        after = " | ".join([f"{i}: {c}" for i, c in c2.items()])
+        await ctx.reply(f"原: {orgin}\n后: {after}")
+
+
 # 事件处理
 @bot.event
 async def on_ready():
