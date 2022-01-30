@@ -1,16 +1,42 @@
-import os
+import json
+import pathlib
 import random
+from collections import Counter
 
 import discord
 from discord.ext import commands
 from loguru import logger
 from playhouse.shortcuts import model_to_dict
 
-from config import BOT_TOKEN, INIT_POOL, POOL, PROXY
+from config import BOT_TOKEN, PROXY
 from db import CARD_MAPPING, Player, PlayerName, Staff, init_db
 from exception import CardNotExist, PlayerNotExist
 from utils.checks import is_not_player, is_player, is_staff
 
+if pathlib.Path("pool.json").exists():
+    with open("pool.json", "r") as f:
+        POOL: list = json.load(f)
+else:
+    PRIZE = {
+        "与": 300,
+        "共": 300,
+        "同": 300,
+        "迎": 300,
+        "K": 120,
+        "年": 120,
+        "D": 40,
+        "虎": 20,
+        "充100返5 充值小福利": 15,
+        "5.2rmb 祝福小红包": 20,
+        "1.68rmb 祝福小红包": 40,
+        "公会大鼎冠名1日": 1,
+        "虎年自定义tag一个月": 3,
+    }
+    POOL = list()
+    for prize, count in PRIZE.items():
+        POOL = POOL + [prize] * count
+    with open("pool.json", "w") as f:
+        json.dump(POOL, f)
 
 bot = commands.Bot(command_prefix="$", proxy=PROXY)
 HELP_STRING = """命令（括号内是快捷命令）:
@@ -27,9 +53,31 @@ $虎年 赠送字帖'虎' @xxx
 $虎年 赠送字帖'年' @xxx"""
 
 
-def draw(pool: str):
+def draw(init=False):
+    global POOL
     """随机抽取一帖"""
-    result = random.choice(pool)
+    if init:
+        init_pool = list(
+            filter(
+                lambda x: x
+                not in (
+                    "D",
+                    "虎",
+                    "充100返5 充值小福利",
+                    "5.2rmb 祝福小红包",
+                    "1.68rmb 祝福小红包",
+                    "公会大鼎冠名1日",
+                    "虎年自定义tag一个月",
+                ),
+                POOL,
+            )
+        )
+        result = random.choice(init_pool)
+    else:
+        result = random.choice(POOL)
+    POOL.remove(result)
+    with open("pool.json", "w") as f:
+        json.dump(POOL, f)
     return result
 
 
@@ -39,8 +87,8 @@ def player_info(discord_id):
     card_info = ""
     for card_name, card_sys_name in CARD_MAPPING.items():
         if c := player_info[card_sys_name]:
-            card_info += f"{card_name}:{c} "
-    return f"""{player_info['discord_id']['name']}玩家剩余抽帖次数：{player_info['draw_count']}\n已经获得帖：{card_info}"""
+            card_info += f"【{card_name}】:{c}  "
+    return f"""{player_info['discord_id']['name']}玩家剩余抽帖次数：{player_info['draw_count']}\n已经获得：{card_info}"""
 
 
 def send_card(owner: int, to: int, card: str, count: int = 1):
@@ -74,7 +122,7 @@ async def _join(ctx):
     name = ctx.author.name
     player_name = PlayerName.create(discord_id=discord_id, name=name)
     # 初始化卡获取
-    init_card = draw(INIT_POOL)
+    init_card = draw(init=True)
     player = Player.create(discord_id=player_name)
     player.change_card(init_card, 1)
     await ctx.reply(player_info(player_name.discord_id))
@@ -85,7 +133,7 @@ async def _join(ctx):
 async def _raffle(ctx):
     logger.info("Command get")
     player = Player.get(Player.discord_id == ctx.author.id)
-    card = draw(POOL)
+    card = draw()
     if player.draw_count <= 0:  # 判断是否还有抽帖次数
         await ctx.reply("你的抽帖次数已经用完。")
         return
@@ -160,7 +208,7 @@ async def _send_8(ctx, user: discord.User):
 # 管理员指令
 @tiger.command(name="管理员")
 @is_staff()
-async def add_admin(ctx, user:discord.User):
+async def add_admin(ctx, user: discord.User):
     Staff.create(discord_id=user.id)
     await ctx.reply(f"已经任命{user.name}为管理员")
 
@@ -168,10 +216,18 @@ async def add_admin(ctx, user:discord.User):
 @tiger.command(name="增加")
 @is_staff()
 async def add_count(ctx, user: discord.User, count: int):
-    player = Player.get(Player.discord_id==user.id)
+    player = Player.get(Player.discord_id == user.id)
     player.draw_count += count
     player.save()
     await ctx.reply(f"给{player.discord_id.name}增加{count}次抽帖次数。")
+
+
+@tiger.command(name="奖池情况")
+@is_staff()
+async def prize_pool_info(ctx):
+    c = Counter(POOL)
+    s = " | ".join([f"{i}: {c}" for i, c in c.items()])
+    await ctx.author.send(s)
 
 
 # 事件处理
@@ -185,7 +241,7 @@ async def on_ready():
 async def on_command_error(ctx, error):
     # 没有参加活动报错处理
     match type(error).__name__:
-        case "IsNotPlayer"|"CardNotExist"|"PlayerNotExist"|"IsPlayer"|"IsNotStaff":
+        case "IsNotPlayer" | "CardNotExist" | "PlayerNotExist" | "IsPlayer" | "IsNotStaff":
             await ctx.send(error)
         case _:
             logger.error(error)

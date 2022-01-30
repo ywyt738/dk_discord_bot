@@ -49,6 +49,11 @@ class Player(BaseModel):
     card_6 = SmallIntegerField(default=0)
     card_7 = SmallIntegerField(default=0)
     card_8 = SmallIntegerField(default=0)
+    return_5 = SmallIntegerField(default=0)
+    hongbao_5_2 = SmallIntegerField(default=0)
+    hongbao_1_68 = SmallIntegerField(default=0)
+    naming = SmallIntegerField(default=0)
+    custom_tag = SmallIntegerField(default=0)
 
 
     def change_card(self, card_name, count):
@@ -69,6 +74,16 @@ class Player(BaseModel):
                 self.card_7 += count
             case "年" :
                 self.card_8 += count
+            case "充100返5 充值小福利" :
+                self.return_5 += count
+            case "5.2rmb 祝福小红包":
+                self.hongbao_5_2 += count
+            case "1.68rmb 祝福小红包":
+                self.hongbao_1_68 += count
+            case "公会大鼎冠名1日":
+                self.naming += count
+            case "虎年自定义tag一个月":
+                self.custom_tag += count
         self.save()
 
     def get_card_count(self, card_name):
@@ -93,6 +108,11 @@ CARD_MAPPING = {
     "迎": "card_6",
     "虎": "card_7",
     "年": "card_8",
+    "充100返5 充值小福利": "return_5",
+    "5.2rmb 祝福小红包": "hongbao_5_2",
+    "1.68rmb 祝福小红包": "hongbao_1_68",
+    "公会大鼎冠名1日": "naming",
+    "虎年自定义tag一个月": "custom_tag",
 }
 
 
