@@ -13,25 +13,26 @@ from db import CARD_MAPPING, Player, PlayerName, Staff, init_db
 from exception import CardNotExist, PlayerNotExist
 from utils.checks import is_not_player, is_player, is_staff
 
+
+PRIZE = {
+    "与": 300,
+    "共": 300,
+    "同": 300,
+    "迎": 300,
+    "K": 120,
+    "年": 120,
+    "D": 40,
+    "虎": 40,
+    "充100返5 充值小福利": 15,
+    "5.2rmb 祝福小红包": 20,
+    "1.68rmb 祝福小红包": 40,
+    "公会大鼎冠名1日": 1,
+    "虎年自定义tag一个月": 3,
+}
 if pathlib.Path(POOL_JSON).exists():
     with open(POOL_JSON, "r") as f:
         POOL: list = json.load(f)
 else:
-    PRIZE = {
-        "与": 300,
-        "共": 300,
-        "同": 300,
-        "迎": 300,
-        "K": 120,
-        "年": 120,
-        "D": 40,
-        "虎": 40,
-        "充100返5 充值小福利": 15,
-        "5.2rmb 祝福小红包": 20,
-        "1.68rmb 祝福小红包": 40,
-        "公会大鼎冠名1日": 1,
-        "虎年自定义tag一个月": 3,
-    }
     POOL = list()
     for prize, count in PRIZE.items():
         POOL = POOL + [prize] * count
@@ -233,7 +234,7 @@ async def prize_pool_info(ctx):
 @tiger.command(name="奖池增加")
 @is_staff()
 async def add_prize(ctx, prize: str, count: int):
-    global POOL, PRIZE
+    global POOL
     c1 = Counter(POOL)
     orgin = " | ".join([f"{i}: {c}" for i, c in c1.items()])
     if prize not in PRIZE.keys():
