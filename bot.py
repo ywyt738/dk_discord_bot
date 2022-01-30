@@ -8,13 +8,13 @@ from discord.ext import commands
 from loguru import logger
 from playhouse.shortcuts import model_to_dict
 
-from config import BOT_TOKEN, PROXY
+from config import BOT_TOKEN, PROXY, POOL_JSON
 from db import CARD_MAPPING, Player, PlayerName, Staff, init_db
 from exception import CardNotExist, PlayerNotExist
 from utils.checks import is_not_player, is_player, is_staff
 
-if pathlib.Path("pool.json").exists():
-    with open("pool.json", "r") as f:
+if pathlib.Path(POOL_JSON).exists():
+    with open(POOL_JSON, "r") as f:
         POOL: list = json.load(f)
 else:
     PRIZE = {
@@ -35,7 +35,7 @@ else:
     POOL = list()
     for prize, count in PRIZE.items():
         POOL = POOL + [prize] * count
-    with open("pool.json", "w") as f:
+    with open(POOL_JSON, "w") as f:
         json.dump(POOL, f)
 
 bot = commands.Bot(command_prefix="$", proxy=PROXY)
@@ -76,7 +76,7 @@ def draw(init=False):
     else:
         result = random.choice(POOL)
     POOL.remove(result)
-    with open("pool.json", "w") as f:
+    with open(POOL_JSON, "w") as f:
         json.dump(POOL, f)
     return result
 
