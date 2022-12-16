@@ -146,21 +146,21 @@ async def exchange(ctx, user: discord.User, prize: str):
         case "绿":
             if player.card_1 >= 2:
                 player.card_1 = player.card_1 - 2
-                player.card_2 = player.card_1 + 1
+                player.card_2 = player.card_2 + 1
                 player.save()
             else:
                 ctx.reply(f"f{player.discord_id.name}的蓝色袜子不足2双")
         case "黄":
             if player.card_2 >= 4:
-                player.card_2 = player.card_1 - 4
-                player.card_3 = player.card_1 + 1
+                player.card_2 = player.card_2 - 4
+                player.card_3 = player.card_3 + 1
                 player.save()
             else:
                 ctx.reply(f"f{player.discord_id.name}的绿色袜子不足4双")
         case "紫":
             if player.card_3 >= 6:
-                player.card_3 = player.card_1 - 6
-                player.card_4 = player.card_1 + 1
+                player.card_3 = player.card_3 - 6
+                player.card_4 = player.card_4 + 1
                 player.save()
             else:
                 ctx.reply(f"{player.discord_id.name}的黄色袜子不足6双")
