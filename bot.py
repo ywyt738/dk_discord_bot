@@ -139,7 +139,7 @@ async def add_count(ctx, user: discord.User, count: int):
 
 
 @tiger.command(name="兑换")
-@is_staff
+@is_staff()
 async def exchange(ctx, user: discord.User, prize: str):
     player = Player.get(Player.discord_id == user.id)
     match prize:
