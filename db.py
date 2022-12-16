@@ -1,19 +1,29 @@
-import pathlib
-
-from peewee import (BigIntegerField, BooleanField, CharField, ForeignKeyField,
-                    Model, SmallIntegerField, SqliteDatabase)
+from loguru import logger
+from peewee import (
+    BigIntegerField,
+    BooleanField,
+    CharField,
+    ForeignKeyField,
+    Model,
+    SmallIntegerField,
+    SqliteDatabase,
+)
 from playhouse.sqliteq import SqliteQueueDatabase
 
 from config import DATABASE
-from loguru import logger
 
-database = SqliteDatabase(DATABASE,pragmas={
-    'journal_mode': 'wal',
-    'cache_size': -1 * 64000,  # 64MB
-    'foreign_keys': 1,
-    'ignore_check_constraints': 0,
-    'synchronous': 0})
+database = SqliteDatabase(
+    DATABASE,
+    pragmas={
+        "journal_mode": "wal",
+        "cache_size": -1 * 64000,  # 64MB
+        "foreign_keys": 1,
+        "ignore_check_constraints": 0,
+        "synchronous": 0,
+    },
+)
 # database = SqliteQueueDatabase(DATABASE, autostart=False, queue_max_size=64, results_timeout=5)
+
 
 class BaseModel(Model):
     class Meta:
@@ -46,86 +56,50 @@ class Player(BaseModel):
     card_3 = SmallIntegerField(default=0)
     card_4 = SmallIntegerField(default=0)
     card_5 = SmallIntegerField(default=0)
-    card_6 = SmallIntegerField(default=0)
-    card_7 = SmallIntegerField(default=0)
-    card_8 = SmallIntegerField(default=0)
-    return_5 = SmallIntegerField(default=0)
-    hongbao_5_2 = SmallIntegerField(default=0)
-    hongbao_1_68 = SmallIntegerField(default=0)
-    naming = SmallIntegerField(default=0)
-    custom_tag = SmallIntegerField(default=0)
-
 
     def change_card(self, card_name, count):
         match card_name:
-            case "与":
+            case "蓝色袜子":
                 self.card_1 += count
-            case "D":
+            case "绿色袜子":
                 self.card_2 += count
-            case "K":
+            case "黄色袜子":
                 self.card_3 += count
-            case "共":
+            case "紫色袜子":
                 self.card_4 += count
-            case "同":
+            case "红色袜子":
                 self.card_5 += count
-            case "迎":
-                self.card_6 += count
-            case "虎":
-                self.card_7 += count
-            case "年" :
-                self.card_8 += count
-            case "充100返5 充值小福利" :
-                self.return_5 += count
-            case "5.2rmb 祝福小红包":
-                self.hongbao_5_2 += count
-            case "1.68rmb 祝福小红包":
-                self.hongbao_1_68 += count
-            case "公会大鼎冠名1日":
-                self.naming += count
-            case "虎年自定义tag一个月":
-                self.custom_tag += count
         self.save()
 
     def get_card_count(self, card_name):
         cards = {
-            "与": self.card_1,
-            "D": self.card_2,
-            "K": self.card_3,
-            "共": self.card_4,
-            "同": self.card_5,
-            "迎": self.card_6,
-            "虎": self.card_7,
-            "年": self.card_8,
+            "蓝色袜子": self.card_1,
+            "绿色袜子": self.card_2,
+            "黄色袜子": self.card_3,
+            "紫色袜子": self.card_4,
+            "红色袜子": self.card_5,
         }
         return cards[card_name]
 
+
 CARD_MAPPING = {
-    "与": "card_1",
-    "D": "card_2",
-    "K": "card_3",
-    "共": "card_4",
-    "同": "card_5",
-    "迎": "card_6",
-    "虎": "card_7",
-    "年": "card_8",
-    "充100返5 充值小福利": "return_5",
-    "5.2rmb 祝福小红包": "hongbao_5_2",
-    "1.68rmb 祝福小红包": "hongbao_1_68",
-    "公会大鼎冠名1日": "naming",
-    "虎年自定义tag一个月": "custom_tag",
+    "蓝色袜子": "card_1",
+    "绿色袜子": "card_2",
+    "黄色袜子": "card_3",
+    "紫色袜子": "card_4",
+    "红色袜子": "card_5",
 }
 
 
 def load_init_data():
+    """增加初始管理员"""
     staff_list = [
         330972159411224577,  # Omega
         616502749579837445,  # pinky
-        912103315800735764,  # luna
-        433004236175835138,  # 喵子兮
-        708571256508645409,  # 卡文
     ]
     for i in staff_list:
-        Staff.create(discord_id=i)
+        Staff.create(discord_id=i, is_admin=True)
+
 
 def init_db():
     if not database.get_tables():

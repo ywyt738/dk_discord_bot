@@ -1,3 +1,0 @@
-discord
-loguru
-peewee

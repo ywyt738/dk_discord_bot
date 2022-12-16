@@ -1,0 +1,24 @@
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "pylint>=2.15.8",
+]
+
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "xiaojun.huang", email = "xiaojun.huang@mhp.com"},
+]
+dependencies = [
+    "discord>=2.1.0",
+    "loguru",
+    "peewee",
+]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"

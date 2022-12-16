@@ -1,5 +1,6 @@
-from db import PlayerName, Staff
 from discord.ext import commands
+
+from db import PlayerName, Staff
 from exception import IsNotPlayer, IsNotStaff, IsPlayer
 
 
