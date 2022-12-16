@@ -38,7 +38,10 @@ bot = commands.Bot(command_prefix="$", intents=intents, proxy=PROXY)
 HELP_STRING = """命令（括号内是快捷命令）:
 $圣诞 加入(join/j)\t参加活动
 $圣诞 抽袜子(raffle/r)\t抽一次帖
-$圣诞 我的信息(info)\t查看现有获取袜子的情况以及剩余抽袜子次数"""
+$圣诞 我的信息(info)\t查看现有获取袜子的情况以及剩余抽袜子次数
+$圣诞 兑换 绿\t用2个蓝色可以兑换成1个绿色袜
+$圣诞 兑换 黄\t用4个绿色可以兑换成1个黄色袜
+$圣诞 兑换 紫\t用6个黄色可以兑换成1个紫色袜"""
 
 
 def draw(init=False):
@@ -121,27 +124,9 @@ async def _info(ctx):
     await ctx.reply(player_info(player))
 
 
-# 管理员指令
-@tiger.command(name="管理员")
-@is_staff()
-async def add_admin(ctx, user: discord.User):
-    Staff.create(discord_id=user.id)
-    await ctx.reply(f"已经任命{user.name}为管理员")
-
-
-@tiger.command(name="增加")
-@is_staff()
-async def add_count(ctx, user: discord.User, count: int):
-    player = Player.get(Player.discord_id == user.id)
-    player.draw_count += count
-    player.save()
-    await ctx.reply(f"给{player.discord_id.name}增加{count}次抽袜子次数。")
-
-
-@tiger.command(name="兑换")
-@is_staff()
-async def exchange(ctx, user: discord.User, prize: str):
-    player = Player.get(Player.discord_id == user.id)
+@is_player()
+async def _exchange(ctx, prize: str):
+    player = Player.get(Player.discord_id == ctx.author.id)
     match prize:
         case "绿":
             if player.card_1 >= 2:
@@ -167,6 +152,23 @@ async def exchange(ctx, user: discord.User, prize: str):
                 await ctx.reply("兑换成功")
             else:
                 await ctx.reply(f"{player.discord_id.name}的黄色袜子不足6双")
+
+
+# 管理员指令
+@tiger.command(name="管理员")
+@is_staff()
+async def add_admin(ctx, user: discord.User):
+    Staff.create(discord_id=user.id)
+    await ctx.reply(f"已经任命{user.name}为管理员")
+
+
+@tiger.command(name="增加")
+@is_staff()
+async def add_count(ctx, user: discord.User, count: int):
+    player = Player.get(Player.discord_id == user.id)
+    player.draw_count += count
+    player.save()
+    await ctx.reply(f"给{player.discord_id.name}增加{count}次抽袜子次数。")
 
 
 @tiger.command(name="奖池情况")
@@ -224,6 +226,8 @@ bot.add_command(tiger.command(name="r")(_raffle))
 
 bot.add_command(tiger.command(name="我的信息")(_info))
 bot.add_command(tiger.command(name="info")(_info))
+
+bot.add_command(tiger.command(name="兑换")(_exchange))
 
 
 init_db()
