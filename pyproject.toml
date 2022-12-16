@@ -5,9 +5,9 @@ dev = [
 ]
 
 [project]
-name = ""
-version = ""
-description = ""
+name = "bot"
+version = "1.0"
+description = "bot"
 authors = [
     {name = "xiaojun.huang", email = "xiaojun.huang@mhp.com"},
 ]
