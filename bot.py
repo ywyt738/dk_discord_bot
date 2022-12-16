@@ -138,10 +138,38 @@ async def add_count(ctx, user: discord.User, count: int):
     await ctx.reply(f"给{player.discord_id.name}增加{count}次抽袜子次数。")
 
 
+@tiger.command(name="兑换")
+@is_staff
+async def exchange(ctx, user: discord.User, prize: str):
+    player = Player.get(Player.discord_id == user.id)
+    match prize:
+        case "绿":
+            if player.card_1 >= 2:
+                player.card_1 = player.card_1 - 2
+                player.card_2 = player.card_1 + 1
+                player.save()
+            else:
+                ctx.reply(f"f{player.discord_id.name}的蓝色袜子不足2双")
+        case "黄":
+            if player.card_2 >= 4:
+                player.card_2 = player.card_1 - 4
+                player.card_3 = player.card_1 + 1
+                player.save()
+            else:
+                ctx.reply(f"f{player.discord_id.name}的绿色袜子不足4双")
+        case "紫":
+            if player.card_3 >= 6:
+                player.card_3 = player.card_1 - 6
+                player.card_4 = player.card_1 + 1
+                player.save()
+            else:
+                ctx.reply(f"{player.discord_id.name}的黄色袜子不足6双")
+    await ctx.reply("兑换成功")
+
+
 @tiger.command(name="奖池情况")
 @is_staff()
 async def prize_pool_info(ctx):
-    print("Command 奖池情况")
     c = Counter(POOL)
     s = " | ".join([f"{i}: {c}" for i, c in c.items()])
     await ctx.author.send(s)
@@ -194,11 +222,6 @@ bot.add_command(tiger.command(name="r")(_raffle))
 
 bot.add_command(tiger.command(name="我的信息")(_info))
 bot.add_command(tiger.command(name="info")(_info))
-
-
-@bot.command()
-async def test(ctx):
-    await ctx.reply(ctx.author.id)
 
 
 init_db()

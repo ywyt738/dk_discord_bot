@@ -95,7 +95,7 @@ def load_init_data():
     """增加初始管理员"""
     staff_list = [
         330972159411224577,  # Omega
-        616502749579837445,  # pinky
+        433004236175835138,  # pinky
     ]
     for i in staff_list:
         Staff.create(discord_id=i, is_admin=True)
